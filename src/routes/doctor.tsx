@@ -372,13 +372,16 @@ function StatCard({
     </Card>
   );
 }
-
 function ConsultationView({
   patient,
+  doctor,
   onSaved,
 }: {
   patient: QueueRow;
+  doctor: Doctor;
   onSaved: () => void;
+}) {
+
 }) {
   return (
     <Card>
