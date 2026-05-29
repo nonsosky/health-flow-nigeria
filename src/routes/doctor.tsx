@@ -653,7 +653,6 @@ function ClinicalAI({ patientId }: { patientId: string }) {
 }
 function SoapForm({ patient, doctor, onSaved }: { patient: QueueRow; doctor: Doctor; onSaved: () => void }) {
 
-function SoapForm({ patient, onSaved }: { patient: QueueRow; onSaved: () => void }) {
   const [subjective, setSubjective] = useState("");
   const [objective, setObjective] = useState("");
   const [assessment, setAssessment] = useState("");
