@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Loader2, Send, Stethoscope, AlertTriangle } from "lucide-react";
+import { Loader2, LogOut, Send, Stethoscope, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -20,8 +20,20 @@ const SUPABASE_URL = "https://akrwucfwvwvooxyrdrub.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrcnd1Y2Z3dnd2b294eXJkcnViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3OTAyOTIsImV4cCI6MjA5NTM2NjI5Mn0.EHw35-o2i78Aq0H85dR6zNePubmxNvYlxcf8qOqjUWU";
 const RAG_WEBHOOK = "https://storyreadinginenglish.app.n8n.cloud/webhook/rag-query";
 const SAVE_NOTE_WEBHOOK = "https://storyreadinginenglish.app.n8n.cloud/webhook/save-note";
-const DOCTOR_NAME = "Dr. Adaeze Eze";
-const DOCTOR_PIN = "doctor2026";
+
+type Doctor = {
+  id: string;
+  full_name: string;
+  email: string;
+  specialisation?: string;
+};
+
+function lastName(full?: string) {
+  if (!full) return "";
+  const parts = full.trim().split(/\s+/);
+  return parts[parts.length - 1] ?? "";
+}
+
 
 type QueueRow = {
   appointment_id: string;
