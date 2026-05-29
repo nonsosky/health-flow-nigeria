@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Loader2, Send, Stethoscope, AlertTriangle } from "lucide-react";
+import { Loader2, LogOut, Send, Stethoscope, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -20,8 +20,20 @@ const SUPABASE_URL = "https://akrwucfwvwvooxyrdrub.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrcnd1Y2Z3dnd2b294eXJkcnViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3OTAyOTIsImV4cCI6MjA5NTM2NjI5Mn0.EHw35-o2i78Aq0H85dR6zNePubmxNvYlxcf8qOqjUWU";
 const RAG_WEBHOOK = "https://storyreadinginenglish.app.n8n.cloud/webhook/rag-query";
 const SAVE_NOTE_WEBHOOK = "https://storyreadinginenglish.app.n8n.cloud/webhook/save-note";
-const DOCTOR_NAME = "Dr. Adaeze Eze";
-const DOCTOR_PIN = "doctor2026";
+
+type Doctor = {
+  id: string;
+  full_name: string;
+  email: string;
+  specialisation?: string;
+};
+
+function lastName(full?: string) {
+  if (!full) return "";
+  const parts = full.trim().split(/\s+/);
+  return parts[parts.length - 1] ?? "";
+}
+
 
 type QueueRow = {
   appointment_id: string;
@@ -116,65 +128,36 @@ function statusLabel(status: string) {
   }
 }
 
-function PinGate({ onUnlock }: { onUnlock: () => void }) {
-  const [pin, setPin] = useState("");
-  const [err, setErr] = useState<string | null>(null);
 
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (pin === DOCTOR_PIN) {
-      sessionStorage.setItem("mediflow_doctor_unlocked", "1");
-      onUnlock();
-    } else {
-      setErr("Incorrect PIN.");
-    }
-  }
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-secondary px-4">
-      <Card className="w-full max-w-sm">
-        <CardContent className="p-8">
-          <div className="mb-6 flex flex-col items-center gap-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <Stethoscope className="h-6 w-6 text-primary" />
-            </div>
-            <h1 className="text-xl font-semibold text-foreground">Doctor Access</h1>
-            <p className="text-sm text-muted-foreground">Enter your PIN to continue</p>
-          </div>
-          <form onSubmit={submit} className="space-y-4">
-            <Input
-              type="password"
-              autoFocus
-              value={pin}
-              onChange={(e) => {
-                setPin(e.target.value);
-                setErr(null);
-              }}
-              placeholder="Doctor PIN"
-            />
-            {err && <p className="text-sm text-destructive">{err}</p>}
-            <Button type="submit" className="w-full">Unlock</Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
 
 function DoctorPage() {
-  const [unlocked, setUnlocked] = useState(false);
+  const navigate = useNavigate();
+  const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && sessionStorage.getItem("mediflow_doctor_unlocked") === "1") {
-      setUnlocked(true);
+    if (typeof window === "undefined") return;
+    const raw = localStorage.getItem("mediflow_doctor");
+    if (!raw) {
+      navigate({ to: "/doctor-login" });
+      return;
     }
-  }, []);
+    try {
+      setDoctor(JSON.parse(raw) as Doctor);
+    } catch {
+      localStorage.removeItem("mediflow_doctor");
+      navigate({ to: "/doctor-login" });
+      return;
+    }
+    setReady(true);
+  }, [navigate]);
 
-  if (!unlocked) return <PinGate onUnlock={() => setUnlocked(true)} />;
-  return <DoctorDashboard />;
+  if (!ready || !doctor) return null;
+  return <DoctorDashboard doctor={doctor} />;
 }
 
-function DoctorDashboard() {
+function DoctorDashboard({ doctor }: { doctor: Doctor }) {
+  const navigate = useNavigate();
   const today = useMemo(() => todayISO(), []);
   const [queue, setQueue] = useState<QueueRow[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -200,6 +183,12 @@ function DoctorDashboard() {
     loadQueue();
   }, [loadQueue]);
 
+  function handleSignOut() {
+    localStorage.removeItem("mediflow_doctor");
+    navigate({ to: "/doctor-login" });
+  }
+
+
   const selected = useMemo(
     () => queue?.find((q) => q.appointment_id === selectedId) ?? null,
     [queue, selectedId],
@@ -218,19 +207,36 @@ function DoctorDashboard() {
     <div className="min-h-screen bg-secondary">
       {/* Top bar */}
       <header className="border-b bg-background">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-4 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4">
           <Link to="/" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
               <Stethoscope className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="text-lg font-semibold text-primary">MediFlow</span>
           </Link>
-          <div className="text-center text-sm font-medium text-foreground md:text-base">
-            {DOCTOR_NAME} — Doctor Dashboard
+          <div className="hidden flex-1 text-center text-sm font-medium text-foreground sm:block md:text-base">
+            Dr. {lastName(doctor.full_name)}
+            {doctor.specialisation ? ` — ${doctor.specialisation}` : ""}
           </div>
-          <div className="text-sm text-muted-foreground md:text-right">{fmtDateLong(today)}</div>
+          <div className="flex items-center gap-4">
+            <span className="hidden text-sm text-muted-foreground md:inline">
+              {fmtDateLong(today)}
+            </span>
+            <button
+              onClick={handleSignOut}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </button>
+          </div>
+        </div>
+        <div className="mx-auto block max-w-7xl px-4 pb-3 text-center text-sm font-medium text-foreground sm:hidden">
+          Dr. {lastName(doctor.full_name)}
+          {doctor.specialisation ? ` — ${doctor.specialisation}` : ""}
         </div>
       </header>
+
 
       {/* Stat cards */}
       <div className="mx-auto max-w-7xl px-4 pt-6">
@@ -322,8 +328,10 @@ function DoctorDashboard() {
             <ConsultationView
               key={selected.appointment_id}
               patient={selected}
+              doctor={doctor}
               onSaved={() => loadQueue()}
             />
+
           ) : (
             <Card>
               <CardContent className="p-10 text-center text-sm text-muted-foreground">
@@ -364,14 +372,16 @@ function StatCard({
     </Card>
   );
 }
-
 function ConsultationView({
   patient,
+  doctor,
   onSaved,
 }: {
   patient: QueueRow;
+  doctor: Doctor;
   onSaved: () => void;
 }) {
+
   return (
     <Card>
       <CardContent className="p-5">
@@ -402,7 +412,8 @@ function ConsultationView({
 
         <div className="mt-6 border-t pt-6">
           <h3 className="mb-3 text-sm font-semibold text-foreground">Save consultation notes</h3>
-          <SoapForm patient={patient} onSaved={onSaved} />
+          <SoapForm patient={patient} doctor={doctor} onSaved={onSaved} />
+
         </div>
       </CardContent>
     </Card>
@@ -640,8 +651,8 @@ function ClinicalAI({ patientId }: { patientId: string }) {
     </div>
   );
 }
+function SoapForm({ patient, doctor, onSaved }: { patient: QueueRow; doctor: Doctor; onSaved: () => void }) {
 
-function SoapForm({ patient, onSaved }: { patient: QueueRow; onSaved: () => void }) {
   const [subjective, setSubjective] = useState("");
   const [objective, setObjective] = useState("");
   const [assessment, setAssessment] = useState("");
@@ -666,7 +677,8 @@ function SoapForm({ patient, onSaved }: { patient: QueueRow; onSaved: () => void
           soap_plan: plan,
           diagnosis,
           prescription,
-          doctor_name: DOCTOR_NAME,
+          doctor_name: doctor.full_name,
+
         }),
       });
       if (!res.ok) throw new Error("save failed");
