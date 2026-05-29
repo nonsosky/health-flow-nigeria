@@ -207,19 +207,36 @@ function DoctorDashboard({ doctor }: { doctor: Doctor }) {
     <div className="min-h-screen bg-secondary">
       {/* Top bar */}
       <header className="border-b bg-background">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-4 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4">
           <Link to="/" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
               <Stethoscope className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="text-lg font-semibold text-primary">MediFlow</span>
           </Link>
-          <div className="text-center text-sm font-medium text-foreground md:text-base">
-            {DOCTOR_NAME} — Doctor Dashboard
+          <div className="hidden flex-1 text-center text-sm font-medium text-foreground sm:block md:text-base">
+            Dr. {lastName(doctor.full_name)}
+            {doctor.specialisation ? ` — ${doctor.specialisation}` : ""}
           </div>
-          <div className="text-sm text-muted-foreground md:text-right">{fmtDateLong(today)}</div>
+          <div className="flex items-center gap-4">
+            <span className="hidden text-sm text-muted-foreground md:inline">
+              {fmtDateLong(today)}
+            </span>
+            <button
+              onClick={handleSignOut}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </button>
+          </div>
+        </div>
+        <div className="mx-auto block max-w-7xl px-4 pb-3 text-center text-sm font-medium text-foreground sm:hidden">
+          Dr. {lastName(doctor.full_name)}
+          {doctor.specialisation ? ` — ${doctor.specialisation}` : ""}
         </div>
       </header>
+
 
       {/* Stat cards */}
       <div className="mx-auto max-w-7xl px-4 pt-6">
