@@ -174,19 +174,33 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
 }
 
 function DoctorPage() {
-  const [unlocked, setUnlocked] = useState(false);
+  const navigate = useNavigate();
+  const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && sessionStorage.getItem("mediflow_doctor_unlocked") === "1") {
-      setUnlocked(true);
+    if (typeof window === "undefined") return;
+    const raw = localStorage.getItem("mediflow_doctor");
+    if (!raw) {
+      navigate({ to: "/doctor-login" });
+      return;
     }
-  }, []);
+    try {
+      setDoctor(JSON.parse(raw) as Doctor);
+    } catch {
+      localStorage.removeItem("mediflow_doctor");
+      navigate({ to: "/doctor-login" });
+      return;
+    }
+    setReady(true);
+  }, [navigate]);
 
-  if (!unlocked) return <PinGate onUnlock={() => setUnlocked(true)} />;
-  return <DoctorDashboard />;
+  if (!ready || !doctor) return null;
+  return <DoctorDashboard doctor={doctor} />;
 }
 
-function DoctorDashboard() {
+function DoctorDashboard({ doctor }: { doctor: Doctor }) {
+  const navigate = useNavigate();
   const today = useMemo(() => todayISO(), []);
   const [queue, setQueue] = useState<QueueRow[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -211,6 +225,12 @@ function DoctorDashboard() {
   useEffect(() => {
     loadQueue();
   }, [loadQueue]);
+
+  function handleSignOut() {
+    localStorage.removeItem("mediflow_doctor");
+    navigate({ to: "/doctor-login" });
+  }
+
 
   const selected = useMemo(
     () => queue?.find((q) => q.appointment_id === selectedId) ?? null,
