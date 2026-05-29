@@ -128,50 +128,7 @@ function statusLabel(status: string) {
   }
 }
 
-function PinGate({ onUnlock }: { onUnlock: () => void }) {
-  const [pin, setPin] = useState("");
-  const [err, setErr] = useState<string | null>(null);
 
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (pin === DOCTOR_PIN) {
-      sessionStorage.setItem("mediflow_doctor_unlocked", "1");
-      onUnlock();
-    } else {
-      setErr("Incorrect PIN.");
-    }
-  }
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-secondary px-4">
-      <Card className="w-full max-w-sm">
-        <CardContent className="p-8">
-          <div className="mb-6 flex flex-col items-center gap-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <Stethoscope className="h-6 w-6 text-primary" />
-            </div>
-            <h1 className="text-xl font-semibold text-foreground">Doctor Access</h1>
-            <p className="text-sm text-muted-foreground">Enter your PIN to continue</p>
-          </div>
-          <form onSubmit={submit} className="space-y-4">
-            <Input
-              type="password"
-              autoFocus
-              value={pin}
-              onChange={(e) => {
-                setPin(e.target.value);
-                setErr(null);
-              }}
-              placeholder="Doctor PIN"
-            />
-            {err && <p className="text-sm text-destructive">{err}</p>}
-            <Button type="submit" className="w-full">Unlock</Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
 
 function DoctorPage() {
   const navigate = useNavigate();
