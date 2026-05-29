@@ -412,7 +412,8 @@ function ConsultationView({
 
         <div className="mt-6 border-t pt-6">
           <h3 className="mb-3 text-sm font-semibold text-foreground">Save consultation notes</h3>
-          <SoapForm patient={patient} onSaved={onSaved} />
+          <SoapForm patient={patient} doctor={doctor} onSaved={onSaved} />
+
         </div>
       </CardContent>
     </Card>
