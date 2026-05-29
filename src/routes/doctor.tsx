@@ -382,7 +382,6 @@ function ConsultationView({
   onSaved: () => void;
 }) {
 
-}) {
   return (
     <Card>
       <CardContent className="p-5">
