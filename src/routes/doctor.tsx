@@ -328,8 +328,10 @@ function DoctorDashboard({ doctor }: { doctor: Doctor }) {
             <ConsultationView
               key={selected.appointment_id}
               patient={selected}
+              doctor={doctor}
               onSaved={() => loadQueue()}
             />
+
           ) : (
             <Card>
               <CardContent className="p-10 text-center text-sm text-muted-foreground">
