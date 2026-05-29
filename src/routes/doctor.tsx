@@ -678,7 +678,8 @@ function SoapForm({ patient, onSaved }: { patient: QueueRow; onSaved: () => void
           soap_plan: plan,
           diagnosis,
           prescription,
-          doctor_name: DOCTOR_NAME,
+          doctor_name: doctor.full_name,
+
         }),
       });
       if (!res.ok) throw new Error("save failed");
