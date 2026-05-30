@@ -49,9 +49,10 @@ function DoctorLogin() {
         return;
       }
 
-      const data = await res.json().catch(() => ({}));
+      const raw = await res.json().catch(() => null);
+      const data = Array.isArray(raw) ? raw[0] : raw;
 
-      if (res.ok && data.success && data.doctor) {
+      if (res.ok && data && data.success && data.doctor) {
         localStorage.setItem("mediflow_doctor", JSON.stringify(data.doctor));
         navigate({ to: "/doctor" });
       } else {

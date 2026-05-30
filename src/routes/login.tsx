@@ -43,18 +43,18 @@ function Login() {
         body: JSON.stringify({ email, portal_pin }),
       });
 
-      if (!res.ok) throw new Error("Request failed");
+      const raw = await res.json().catch(() => null);
+      // n8n sometimes wraps the response in an array — unwrap it
+      const data = Array.isArray(raw) ? raw[0] : raw;
 
-      const data = await res.json();
-
-      if (data.success && data.patient) {
+      if (res.ok && data && data.success && data.patient) {
         localStorage.setItem("mediflow_patient", JSON.stringify(data.patient));
         navigate({ to: "/dashboard" });
       } else {
-        throw new Error("Invalid credentials");
+        setError("Incorrect email or PIN. Please try again.");
       }
     } catch {
-      setError("Incorrect email or PIN. Please try again.");
+      setError("Unable to connect. Please check your connection and try again.");
     } finally {
       setSubmitting(false);
     }
