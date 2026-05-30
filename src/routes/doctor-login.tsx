@@ -52,8 +52,16 @@ function DoctorLogin() {
       const raw = await res.json().catch(() => null);
       const data = Array.isArray(raw) ? raw[0] : raw;
 
-      if (res.ok && data && data.success && data.doctor) {
-        localStorage.setItem("mediflow_doctor", JSON.stringify(data.doctor));
+      const doctorRaw = data && (data.doctor ?? data.patient ?? data.user);
+      if (res.ok && data && data.success && doctorRaw) {
+        const doctor = {
+          id: doctorRaw.id,
+          full_name: doctorRaw.full_name,
+          email: doctorRaw.email,
+          specialisation:
+            doctorRaw.specialisation ?? doctorRaw["specialisation:"] ?? "",
+        };
+        localStorage.setItem("mediflow_doctor", JSON.stringify(doctor));
         navigate({ to: "/doctor" });
       } else {
         setError("Incorrect email or PIN. Please try again.");
