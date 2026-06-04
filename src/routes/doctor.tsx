@@ -222,6 +222,12 @@ function DoctorDashboard({ doctor }: { doctor: Doctor }) {
             <span className="hidden text-sm text-muted-foreground md:inline">
               {fmtDateLong(today)}
             </span>
+            <Link
+              to="/admin"
+              className="text-sm font-medium text-muted-foreground transition hover:text-foreground"
+            >
+              Analytics
+            </Link>
             <button
               onClick={handleSignOut}
               className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
@@ -230,6 +236,7 @@ function DoctorDashboard({ doctor }: { doctor: Doctor }) {
               Sign out
             </button>
           </div>
+
         </div>
         <div className="mx-auto block max-w-7xl px-4 pb-3 text-center text-sm font-medium text-foreground sm:hidden">
           Dr. {lastName(doctor.full_name)}
