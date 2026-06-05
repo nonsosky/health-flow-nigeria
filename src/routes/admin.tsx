@@ -332,10 +332,10 @@ function DashboardTabs({ data }: { data: Analytics }) {
         <div className="grid gap-6 lg:grid-cols-2">
           <Card className="border-slate-800 bg-slate-900">
             <CardContent className="p-6">
-              <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-400">
-                Appointment Trend
+              <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-400">
+                <Activity className="h-4 w-4 text-teal-400" /> Live Activity Feed
               </h3>
-              <AppointmentTrendChart data={data.appointmentTrend ?? []} />
+              <ActivityFeed events={data.recentActivity ?? []} />
             </CardContent>
           </Card>
 
@@ -344,7 +344,7 @@ function DashboardTabs({ data }: { data: Analytics }) {
               <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-400">
                 <AlertTriangle className="h-4 w-4 text-red-400" /> Today's Urgent Cases
               </h3>
-              <UrgentTable rows={urgentActive} />
+              <UrgentTable rows={urgentActive} showTime />
             </CardContent>
           </Card>
         </div>
