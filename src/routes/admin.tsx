@@ -600,9 +600,11 @@ function ProgressRow({ label, value, color }: { label: string; value: number; co
 function UrgentTable({
   rows,
   detailed = false,
+  showTime = false,
 }: {
   rows: NonNullable<Analytics["urgentToday"]>;
   detailed?: boolean;
+  showTime?: boolean;
 }) {
   if (!rows?.length) {
     return <p className="text-sm text-slate-500">No urgent cases today.</p>;
@@ -615,6 +617,7 @@ function UrgentTable({
             {detailed && <th className="pb-2 pr-3">#</th>}
             <th className="pb-2 pr-3">Patient</th>
             <th className="pb-2 pr-3">Symptom</th>
+            {showTime && <th className="pb-2 pr-3">Time</th>}
             <th className="pb-2">Status</th>
           </tr>
         </thead>
@@ -623,12 +626,15 @@ function UrgentTable({
             <tr key={i} className="border-b border-slate-800/50">
               {detailed && <td className="py-2 pr-3 text-slate-400">{i + 1}</td>}
               <td className="py-2 pr-3 font-medium text-slate-100">
-                {r.patient_id ?? r.name ?? "—"}
+                {r.name ?? r.patient_id ?? "—"}
               </td>
               <td className="py-2 pr-3 text-slate-300">{r.symptom}</td>
+              {showTime && (
+                <td className="py-2 pr-3 text-slate-300">{r.time ?? "—"}</td>
+              )}
               <td className="py-2">
                 <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-xs font-semibold uppercase text-red-400">
-                  {r.status ?? "urgent"}
+                  URGENT
                 </span>
               </td>
             </tr>
@@ -637,6 +643,68 @@ function UrgentTable({
       </table>
     </div>
   );
+}
+
+function ActivityFeed({ events }: { events: NonNullable<Analytics["recentActivity"]> }) {
+  const items = useMemo(() => {
+    const today = new Date();
+    const isSameDay = (d: Date) =>
+      d.getFullYear() === today.getFullYear() &&
+      d.getMonth() === today.getMonth() &&
+      d.getDate() === today.getDate();
+
+    const parsed = (events ?? [])
+      .map((e) => ({ ...e, _t: new Date(e.time) }))
+      .filter((e) => !isNaN(e._t.getTime()) && isSameDay(e._t))
+      .sort((a, b) => b._t.getTime() - a._t.getTime())
+      .slice(0, 10);
+    return parsed;
+  }, [events]);
+
+  if (!items.length) {
+    return <p className="text-sm text-slate-500">No activity yet today.</p>;
+  }
+
+  return (
+    <ul className="space-y-3">
+      {items.map((e, i) => {
+        const { Icon, color, bg } = activityVisual(e.type);
+        return (
+          <li key={i} className="flex items-start gap-3">
+            <div
+              className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+              style={{ backgroundColor: bg }}
+            >
+              <Icon className="h-4 w-4" style={{ color }} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm text-slate-200">{e.message}</p>
+              <p className="text-xs text-slate-500">
+                {e._t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </p>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function activityVisual(type: string): {
+  Icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  color: string;
+  bg: string;
+} {
+  const t = (type ?? "").toLowerCase();
+  if (t.includes("regist")) return { Icon: UserPlus, color: BLUE, bg: "rgba(59,130,246,0.15)" };
+  if (t.includes("cancel")) return { Icon: CalendarX, color: ORANGE, bg: "rgba(251,146,60,0.15)" };
+  if (t.includes("urgent") || t.includes("alert"))
+    return { Icon: AlertTriangle, color: RED, bg: "rgba(239,68,68,0.15)" };
+  if (t.includes("soap") || t.includes("note"))
+    return { Icon: FileText, color: PURPLE, bg: "rgba(168,85,247,0.15)" };
+  if (t.includes("book") || t.includes("appoint"))
+    return { Icon: CalendarCheck, color: TEAL, bg: "rgba(0,229,200,0.15)" };
+  return { Icon: ClipboardList, color: "#94a3b8", bg: "rgba(148,163,184,0.15)" };
 }
 
 function ConfigRow({ label, value }: { label: string; value: string }) {
