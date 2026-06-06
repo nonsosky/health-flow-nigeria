@@ -73,6 +73,10 @@ N8N_ANALYTICS_URL=
 ## System Architecture
 <img width="620" height="749" alt="image" src="https://github.com/user-attachments/assets/4d14e713-7d9f-42c4-b43a-0a690bf1a67a" />
 
+## System Design
+<img width="665" height="458" alt="Homepage" src="https://github.com/user-attachments/assets/fd0df2a2-1376-4cd7-96cd-3bb2fb551523" />
+<img width="827" height="447" alt="MediFlow AI image" src="https://github.com/user-attachments/assets/41f15a53-9f69-4307-a3cd-44136a9d9f2f" />
+<img width="686" height="352" alt="Live Dashboard" src="https://github.com/user-attachments/assets/2d7508d0-ed00-4a7e-aac9-ac2b3a7a7a2e" />
 
 ## Author
 Okpara Kenneth Chinonso
