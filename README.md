@@ -70,6 +70,10 @@ N8N_ANALYTICS_URL=
 | Cancel Appointment | POST /cancel | Cancel and free slot |
 | Analytics Dashboard | POST /analytics | Aggregate clinic metrics |
 
+## System Architecture
+<img width="620" height="749" alt="image" src="https://github.com/user-attachments/assets/4d14e713-7d9f-42c4-b43a-0a690bf1a67a" />
+
+
 ## Author
 Okpara Kenneth Chinonso
 Healthcare — Nigeria & Africa
