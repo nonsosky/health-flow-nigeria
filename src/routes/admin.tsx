@@ -653,22 +653,18 @@ function UrgentTable({
 
 function ActivityFeed({ events }: { events: NonNullable<Analytics["recentActivity"]> }) {
   const items = useMemo(() => {
-    const today = new Date();
-    const isSameDay = (d: Date) =>
-      d.getFullYear() === today.getFullYear() &&
-      d.getMonth() === today.getMonth() &&
-      d.getDate() === today.getDate();
-
-    const parsed = (events ?? [])
+    return (events ?? [])
       .map((e) => ({ ...e, _t: new Date(e.time) }))
-      .filter((e) => !isNaN(e._t.getTime()) && isSameDay(e._t))
-      .sort((a, b) => b._t.getTime() - a._t.getTime())
+      .sort((a, b) => {
+        const at = isNaN(a._t.getTime()) ? 0 : a._t.getTime();
+        const bt = isNaN(b._t.getTime()) ? 0 : b._t.getTime();
+        return bt - at;
+      })
       .slice(0, 10);
-    return parsed;
   }, [events]);
 
   if (!items.length) {
-    return <p className="text-sm text-slate-500">No activity yet today.</p>;
+    return <p className="text-sm text-slate-500">No recent activity.</p>;
   }
 
   return (
