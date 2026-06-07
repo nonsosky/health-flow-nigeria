@@ -547,7 +547,11 @@ function DonutChart({ data }: { data: { name: string; value: number }[] }) {
               <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: 8 }} />
+          <Tooltip
+            contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: 8, color: "#f1f5f9" }}
+            itemStyle={{ color: "#f1f5f9" }}
+            labelStyle={{ color: "#f1f5f9" }}
+          />
           <Legend wrapperStyle={{ color: "#cbd5e1", fontSize: 12 }} />
         </PieChart>
       </ResponsiveContainer>
