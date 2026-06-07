@@ -18,8 +18,8 @@ export const Route = createFileRoute("/doctor")({
 
 const SUPABASE_URL = "https://akrwucfwvwvooxyrdrub.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrcnd1Y2Z3dnd2b294eXJkcnViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3OTAyOTIsImV4cCI6MjA5NTM2NjI5Mn0.EHw35-o2i78Aq0H85dR6zNePubmxNvYlxcf8qOqjUWU";
-const RAG_WEBHOOK = "https://kendososky.app.n8n.cloud/webhook/rag-query";
-const SAVE_NOTE_WEBHOOK = "https://kendososky.app.n8n.cloud/webhook/save-note";
+const RAG_WEBHOOK = "https://unpledged-mayflower-motion.ngrok-free.dev/webhook/rag-query";
+const SAVE_NOTE_WEBHOOK = "https://unpledged-mayflower-motion.ngrok-free.dev/webhook/save-note";
 
 type Doctor = {
   id: string;

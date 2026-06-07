@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Loader2, Eye, EyeOff, Stethoscope } from "lucide-react";
 
-const WEBHOOK_URL = "https://kendososky.app.n8n.cloud/webhook/doctor_login";
+const WEBHOOK_URL = "https://unpledged-mayflower-motion.ngrok-free.dev/webhook/doctor_login";
 
 export const Route = createFileRoute("/doctor-login")({
   head: () => ({

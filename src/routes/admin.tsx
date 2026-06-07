@@ -45,7 +45,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-const ANALYTICS_WEBHOOK = "https://kendososky.app.n8n.cloud/webhook/analytics";
+const ANALYTICS_WEBHOOK = "https://unpledged-mayflower-motion.ngrok-free.dev/webhook/analytics";
 const ADMIN_PIN = "doctor2026";
 const AUTH_KEY = "mediflow_admin_auth";
 const REFRESH_MS = 60_000;

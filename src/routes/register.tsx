@@ -4,7 +4,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const WEBHOOK_URL = "https://kendososky.app.n8n.cloud/webhook/register";
+const WEBHOOK_URL = "https://unpledged-mayflower-motion.ngrok-free.dev/webhook/register";
 
 export const Route = createFileRoute("/register")({
   head: () => ({
