@@ -682,7 +682,9 @@ function ActivityFeed({ events }: { events: NonNullable<Analytics["recentActivit
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm text-slate-200">{e.message}</p>
               <p className="text-xs text-slate-500">
-                {e._t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                {isNaN(e._t.getTime())
+                  ? e.time
+                  : e._t.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
               </p>
             </div>
           </li>
