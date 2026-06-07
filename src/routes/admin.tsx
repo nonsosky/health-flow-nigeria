@@ -77,7 +77,7 @@ type Analytics = {
   bloodGroups?: { group: string; count: number }[];
   genderDistribution?: { gender: string; count: number }[];
   topAllergies?: { name: string; count: number }[];
-  urgentToday?: { patient_id?: string; name?: string; symptom: string; status?: string; time?: string }[];
+  urgentToday?: { patient_id?: string; patients?: string; name?: string; symptom: string; status?: string; time?: string }[];
   recentActivity?: { type: string; message: string; time: string }[];
   ragModel?: string;
   embeddingModel?: string;
@@ -439,11 +439,13 @@ function DashboardTabs({ data }: { data: Analytics }) {
               <p className="text-sm text-slate-500">No allergy data.</p>
             ) : (
               <ul className="divide-y divide-slate-800">
-                {data.topAllergies!.map((a, i) => (
+                {data.topAllergies!.map((a: any, i) => (
                   <li key={i} className="flex items-center justify-between py-2">
-                    <span className="text-sm text-slate-200">{a.name}</span>
+                    <span className="text-sm text-slate-200">
+                      {a.name ?? a.allergy ?? a.allergies ?? a.label ?? "—"}
+                    </span>
                     <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs font-semibold text-slate-300">
-                      {a.count}
+                      {a.count ?? a.value ?? a.total ?? 0}
                     </span>
                   </li>
                 ))}
@@ -545,7 +547,11 @@ function DonutChart({ data }: { data: { name: string; value: number }[] }) {
               <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: 8 }} />
+          <Tooltip
+            contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: 8, color: "#f1f5f9" }}
+            itemStyle={{ color: "#f1f5f9" }}
+            labelStyle={{ color: "#f1f5f9" }}
+          />
           <Legend wrapperStyle={{ color: "#cbd5e1", fontSize: 12 }} />
         </PieChart>
       </ResponsiveContainer>
@@ -626,7 +632,7 @@ function UrgentTable({
             <tr key={i} className="border-b border-slate-800/50">
               {detailed && <td className="py-2 pr-3 text-slate-400">{i + 1}</td>}
               <td className="py-2 pr-3 font-medium text-slate-100">
-                {r.name ?? r.patient_id ?? "—"}
+                {r.patients ?? r.name ?? r.patient_id ?? "—"}
               </td>
               <td className="py-2 pr-3 text-slate-300">{r.symptom}</td>
               {showTime && (
@@ -647,22 +653,18 @@ function UrgentTable({
 
 function ActivityFeed({ events }: { events: NonNullable<Analytics["recentActivity"]> }) {
   const items = useMemo(() => {
-    const today = new Date();
-    const isSameDay = (d: Date) =>
-      d.getFullYear() === today.getFullYear() &&
-      d.getMonth() === today.getMonth() &&
-      d.getDate() === today.getDate();
-
-    const parsed = (events ?? [])
+    return (events ?? [])
       .map((e) => ({ ...e, _t: new Date(e.time) }))
-      .filter((e) => !isNaN(e._t.getTime()) && isSameDay(e._t))
-      .sort((a, b) => b._t.getTime() - a._t.getTime())
+      .sort((a, b) => {
+        const at = isNaN(a._t.getTime()) ? 0 : a._t.getTime();
+        const bt = isNaN(b._t.getTime()) ? 0 : b._t.getTime();
+        return bt - at;
+      })
       .slice(0, 10);
-    return parsed;
   }, [events]);
 
   if (!items.length) {
-    return <p className="text-sm text-slate-500">No activity yet today.</p>;
+    return <p className="text-sm text-slate-500">No recent activity.</p>;
   }
 
   return (
@@ -680,7 +682,9 @@ function ActivityFeed({ events }: { events: NonNullable<Analytics["recentActivit
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm text-slate-200">{e.message}</p>
               <p className="text-xs text-slate-500">
-                {e._t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                {isNaN(e._t.getTime())
+                  ? e.time
+                  : e._t.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
               </p>
             </div>
           </li>
