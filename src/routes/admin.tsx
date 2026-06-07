@@ -626,7 +626,7 @@ function UrgentTable({
             <tr key={i} className="border-b border-slate-800/50">
               {detailed && <td className="py-2 pr-3 text-slate-400">{i + 1}</td>}
               <td className="py-2 pr-3 font-medium text-slate-100">
-                {r.name ?? r.patient_id ?? "—"}
+                {r.patients ?? r.name ?? r.patient_id ?? "—"}
               </td>
               <td className="py-2 pr-3 text-slate-300">{r.symptom}</td>
               {showTime && (
