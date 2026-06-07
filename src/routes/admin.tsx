@@ -439,11 +439,13 @@ function DashboardTabs({ data }: { data: Analytics }) {
               <p className="text-sm text-slate-500">No allergy data.</p>
             ) : (
               <ul className="divide-y divide-slate-800">
-                {data.topAllergies!.map((a, i) => (
+                {data.topAllergies!.map((a: any, i) => (
                   <li key={i} className="flex items-center justify-between py-2">
-                    <span className="text-sm text-slate-200">{a.name}</span>
+                    <span className="text-sm text-slate-200">
+                      {a.name ?? a.allergy ?? a.allergies ?? a.label ?? "—"}
+                    </span>
                     <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs font-semibold text-slate-300">
-                      {a.count}
+                      {a.count ?? a.value ?? a.total ?? 0}
                     </span>
                   </li>
                 ))}
