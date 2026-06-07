@@ -77,7 +77,7 @@ type Analytics = {
   bloodGroups?: { group: string; count: number }[];
   genderDistribution?: { gender: string; count: number }[];
   topAllergies?: { name: string; count: number }[];
-  urgentToday?: { patient_id?: string; name?: string; symptom: string; status?: string; time?: string }[];
+  urgentToday?: { patient_id?: string; patients?: string; name?: string; symptom: string; status?: string; time?: string }[];
   recentActivity?: { type: string; message: string; time: string }[];
   ragModel?: string;
   embeddingModel?: string;
